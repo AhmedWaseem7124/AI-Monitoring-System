@@ -60,18 +60,12 @@ ip route
 Current configuration:
 
 ```text
-Hostname:          osamamansoor-HP-Z400-Workstation
-LAN IP:            10.1.1.113
-Network Interface: enp1s0
-Gateway:           10.1.0.1
-Network:           10.1.0.0/16
-MAC Address:       78:e7:d1:c3:f0:65
-IP Assignment:     DHCP
+
 ```
 
 The IP address currently appears as DHCP-assigned.
 
-Before relying on `10.1.1.113` for a DNS record, the IP should ideally be made persistent.
+Before relying on `` for a DNS record, the IP should ideally be made persistent.
 
 ---
 
@@ -84,8 +78,7 @@ There are two recommended approaches.
 If the company network administrator controls the DHCP server, create a DHCP reservation using:
 
 ```text
-MAC Address: 78:e7:d1:c3:f0:65
-Reserved IP: 10.1.1.113
+
 ```
 
 This allows Ubuntu to continue using DHCP while ensuring that this specific server always receives `10.1.1.113`.
@@ -98,8 +91,8 @@ Send the following request:
 
 > Please create a DHCP reservation for the Server Room AI server.
 >
-> MAC Address: 78:e7:d1:c3:f0:65
-> Requested IP: 10.1.1.113
+> MAC Address:
+> Requested IP:
 
 The exact procedure depends on the company's DHCP infrastructure, such as:
 
@@ -110,7 +103,7 @@ The exact procedure depends on the company's DHCP infrastructure, such as:
 - UniFi
 - Other network appliance
 
-Do not configure a static IP on Ubuntu until it is confirmed that `10.1.1.113` is reserved or safely outside the DHCP allocation pool.
+Do not configure a static IP on Ubuntu until it is confirmed that `` is reserved or safely outside the DHCP allocation pool.
 
 ---
 
@@ -121,10 +114,7 @@ Only use this option if the network administrator confirms the IP configuration.
 The current network is:
 
 ```text
-IP:       10.1.1.113
-Prefix:   /16
-Gateway:  10.1.0.1
-Interface: enp1s0
+
 ```
 
 DNS servers must be obtained from the company's network administrator or existing DHCP configuration.
@@ -336,22 +326,7 @@ sudo nano /etc/systemd/system/serverroom-ai.service
 Use a configuration similar to:
 
 ```ini
-[Unit]
-Description=Server Room AI Monitoring System
-After=network-online.target
-Wants=network-online.target
 
-[Service]
-User=osamamansoor
-Group=osamamansoor
-WorkingDirectory=/home/osamamansoor/serverroom-ai-prod
-Environment="PATH=/home/osamamansoor/serverroom-ai-prod/venv/bin"
-ExecStart=/home/osamamansoor/serverroom-ai-prod/venv/bin/gunicorn --workers 1 --bind 127.0.0.1:8000 server:app
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
 ```
 
 Save the file.
@@ -1194,53 +1169,7 @@ The AI monitoring service should automatically start after boot and continue pro
 # 25. Current Deployment Information
 
 ```text
-Application:
-Server Room AI Monitoring System
 
-Company Domain:
-crescent.com.pk
-
-Planned Application Domain:
-serverroom.crescent.com.pk
-
-Server Hostname:
-osamamansoor-HP-Z400-Workstation
-
-Server IP:
-10.1.1.113
-
-Network Interface:
-enp1s0
-
-MAC:
-78:e7:d1:c3:f0:65
-
-Gateway:
-10.1.0.1
-
-Network:
-10.1.0.0/16
-
-Project Directory:
-/home/osamamansoor/serverroom-ai-prod
-
-Virtual Environment:
-/home/osamamansoor/serverroom-ai-prod/venv
-
-Internal Application Port:
-127.0.0.1:8000
-
-Public LAN Access:
-Nginx on port 80/443
-
-Application Server:
-Gunicorn
-
-Reverse Proxy:
-Nginx
-
-Process Manager:
-systemd
 ```
 
 ---
