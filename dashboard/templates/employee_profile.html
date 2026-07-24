@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Profile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #020617;
+            color: #e5e7eb;
+            padding: 24px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .back-link {
+            color: #93c5fd;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #2563eb;
+            color: white;
+            padding: 11px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            border: none;
+        }
+
+        .secondary { background: #334155; }
+        .success { background: #16a34a; }
+        .warning { background: #ca8a04; }
+        .danger { background: #dc2626; }
+
+        .hero {
+            background: linear-gradient(145deg, #0f172a, #111827);
+            border: 1px solid #334155;
+            border-radius: 22px;
+            padding: 26px;
+            display: grid;
+            grid-template-columns: 120px 1fr auto;
+            gap: 22px;
+            align-items: center;
+            box-shadow: 0 12px 35px rgba(0,0,0,.3);
+            margin-bottom: 22px;
+        }
+
+        .avatar {
+            width: 110px;
+            height: 110px;
+            border-radius: 24px;
+            background: #020617;
+            border: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 34px;
+            color: #f8fafc;
+        }
+
+        .hero p {
+            color: #94a3b8;
+            margin: 8px 0 0;
+        }
+
+        .badge {
+            padding: 8px 13px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .active {
+            background: #064e3b;
+            color: #34d399;
+        }
+
+        .disabled {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 22px;
+            margin-bottom: 22px;
+        }
+
+        .panel {
+            background: linear-gradient(145deg, #0f172a, #111827);
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.25);
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            margin-bottom: 18px;
+        }
+
+        .info-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .info-item {
+            background: #020617;
+            border: 1px solid #1e293b;
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .label {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .value {
+            color: #e5e7eb;
+            font-weight: bold;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+
+        .stat {
+            background: #020617;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 18px;
+        }
+
+        .stat h3 {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .stat .num {
+            margin-top: 12px;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .green { color: #22c55e; }
+        .red { color: #ef4444; }
+        .blue { color: #3b82f6; }
+        .purple { color: #a855f7; }
+
+        .section-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 12px;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .image-card {
+            position: relative;
+            background: #020617;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 10px;
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 145px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid #1e293b;
+        }
+
+        .menu-wrap {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+        }
+
+        .menu-btn {
+            background: rgba(2, 6, 23, 0.9);
+            color: white;
+            border: 1px solid #334155;
+            border-radius: 9px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 38px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            min-width: 145px;
+            z-index: 20;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,.55);
+        }
+
+        .dropdown a {
+            display: block;
+            color: white;
+            padding: 11px 13px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .dropdown a:hover {
+            background: #1e293b;
+        }
+
+        .menu-wrap:hover .dropdown {
+            display: block;
+        }
+
+        .image-name {
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 8px;
+            word-break: break-all;
+        }
+
+        .empty-gallery {
+            text-align: center;
+            color: #94a3b8;
+            padding: 45px;
+            background: #020617;
+            border: 1px dashed #475569;
+            border-radius: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            color: #94a3b8;
+            text-align: left;
+            padding: 13px;
+            border-bottom: 1px solid #334155;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .event-enter {
+            background: #064e3b;
+            color: #34d399;
+        }
+
+        .event-exit {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        .email-no {
+            background: #334155;
+            color: #cbd5e1;
+        }
+
+        @media (max-width: 1100px) {
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats, .gallery {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 650px) {
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .stats, .gallery {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="topbar">
+    <a href="/employees" class="back-link">← Back to Employees</a>
+
+    <div class="actions">
+        <a href="/employee/{{ employee['id'] }}/edit" class="btn secondary">Edit</a>
+        <a href="/employee/{{ employee['id'] }}/upload" class="btn secondary">Upload</a>
+        <a href="/employee/{{ employee['id'] }}/capture" class="btn success">Capture CCTV</a>
+        <a href="/employees/delete/{{ employee['folder_name'] }}"
+           class="btn danger"
+           onclick="return confirm('Delete this employee and all face images?')">
+            Delete
+        </a>
+    </div>
+</div>
+
+<div class="hero">
+    <div class="avatar">
+        {{ employee["employee_name"][0]|upper }}
+    </div>
+
+    <div>
+        <h1>{{ employee["employee_name"] }}</h1>
+        <p>{{ employee["designation"] }} • {{ employee["department"] }}</p>
+        <p>Employee ID: {{ employee["employee_id"] }}</p>
+    </div>
+
+    <div>
+        {% if employee["status"] == "ACTIVE" %}
+            <span class="badge active">ACTIVE</span>
+        {% else %}
+            <span class="badge disabled">DISABLED</span>
+        {% endif %}
+    </div>
+</div>
+
+<div class="main-grid">
+
+    <div class="panel">
+        <h2>Employee Information</h2>
+
+        <div class="info-list">
+            <div class="info-item">
+                <div class="label">Employee ID</div>
+                <div class="value">{{ employee["employee_id"] }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="label">Department</div>
+                <div class="value">{{ employee["department"] }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="label">Designation</div>
+                <div class="value">{{ employee["designation"] }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="label">Email</div>
+                <div class="value">{{ employee["email"] or "N/A" }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="label">Phone</div>
+                <div class="value">{{ employee["phone"] or "N/A" }}</div>
+            </div>
+
+            <div class="info-item">
+                <div class="label">Last Seen</div>
+                <div class="value">{{ last_seen or "N/A" }}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Activity Overview</h2>
+
+        <div class="stats">
+            <div class="stat">
+                <h3>Total Entries</h3>
+                <div class="num green">{{ total_entries }}</div>
+            </div>
+
+            <div class="stat">
+                <h3>Total Exits</h3>
+                <div class="num red">{{ total_exits }}</div>
+            </div>
+
+            <div class="stat">
+                <h3>Face Images</h3>
+                <div class="num blue">{{ images|length }}</div>
+            </div>
+
+            <div class="stat">
+                <h3>Status</h3>
+                <div class="num purple" style="font-size:22px;">
+                    {{ employee["status"] }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="panel">
+    <div class="section-head">
+        <div>
+            <h2 style="margin:0;">Face Image Gallery</h2>
+            <p style="color:#94a3b8;margin:6px 0 0;">{{ images|length }} enrolled face images</p>
+        </div>
+
+        <div class="actions">
+            <a href="/employee/{{ employee['id'] }}/upload" class="btn secondary">Upload Images</a>
+            <a href="/employee/{{ employee['id'] }}/capture" class="btn success">Capture CCTV</a>
+        </div>
+    </div>
+
+    {% if images|length > 0 %}
+    <div class="gallery">
+        {% for img in images %}
+        <div class="image-card">
+            <img src="/known-face/{{ employee['folder_name'] }}/{{ img }}">
+
+            <div class="menu-wrap">
+                <button class="menu-btn">⋮</button>
+
+                <div class="dropdown">
+                    <a href="/known-face/{{ employee['folder_name'] }}/{{ img }}" target="_blank">Open Image</a>
+                    <a href="/employee/{{ employee['id'] }}/delete-image/{{ img }}"
+                       onclick="return confirm('Delete this face image?')">
+                        Delete Image
+                    </a>
+                </div>
+            </div>
+
+            <div class="image-name">{{ img }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-gallery">
+        No face images enrolled yet.<br><br>
+        <a href="/employee/{{ employee['id'] }}/upload" class="btn secondary">Upload Images</a>
+        <a href="/employee/{{ employee['id'] }}/capture" class="btn success">Capture CCTV</a>
+    </div>
+    {% endif %}
+</div>
+
+<br>
+
+<div class="panel">
+    <div class="section-head">
+        <div>
+            <h2 style="margin:0;">Recent Activity</h2>
+            <p style="color:#94a3b8;margin:6px 0 0;">Latest entry and exit records for this employee</p>
+        </div>
+    </div>
+
+    <table>
+        <tr>
+            <th>Time</th>
+            <th>Event</th>
+            <th>Snapshot</th>
+            <th>Email</th>
+        </tr>
+
+        {% for event in visits %}
+        <tr>
+            <td>{{ event["event_time"] }}</td>
+
+            <td>
+                {% if event["event_type"] == "PERSON_ENTERED" %}
+                    <span class="badge event-enter">ENTER</span>
+                {% elif event["event_type"] == "PERSON_EXITED" %}
+                    <span class="badge event-exit">EXIT</span>
+                {% else %}
+                    {{ event["event_type"] }}
+                {% endif %}
+            </td>
+
+            <td>
+                {% if event["image_path"] %}
+                    <a href="/captures/{{ event['image_path'].split('/')[-1] }}"
+                       target="_blank"
+                       style="color:#93c5fd;">
+                        View Snapshot
+                    </a>
+                {% else %}
+                    No Image
+                {% endif %}
+            </td>
+
+            <td>
+                {% if event["email_sent"] == 1 %}
+                    <span class="badge event-enter">Yes</span>
+                {% else %}
+                    <span class="badge email-no">No</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+</body>
+</html>

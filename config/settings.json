@@ -1,0 +1,23 @@
+{
+    "camera": {
+        "name": "Server Room Camera",
+        "rtsp_url": "rtsp://admin:admin123@10.1.0.67:554/cam/realmonitor?channel=1&subtype=1"
+    },
+    "model": {
+        "path": "models/yolo11n.pt",
+        "confidence": 0.35
+    },
+    "alert": {
+        "cooldown_seconds": 60
+    },
+    "smtp": {
+        "server": "10.1.0.23",
+        "port": 25,
+        "sender": "alerts@crescent.com.pk",
+        "recipient": "intern.it-waseem@crescent.com.pk"
+    },
+    "storage": {
+        "captures_dir": "captures",
+        "database_path": "database/events.db"
+    }
+}

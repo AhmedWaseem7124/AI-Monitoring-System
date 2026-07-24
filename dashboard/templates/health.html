@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Health</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 25px;
+        }
+
+        .panel {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: #020617;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .label {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .value {
+            font-size: 30px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .green { color: #22c55e; }
+        .yellow { color: #eab308; }
+        .red { color: #ef4444; }
+
+        .btn {
+            background: #2563eb;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>System Health Panel</h1>
+
+<p>
+    <a class="btn" href="/">Back to Dashboard</a>
+</p>
+
+<div class="grid">
+
+    <div class="card">
+        <div class="label">CPU Usage</div>
+        <div class="value green">{{ health.cpu_percent }}%</div>
+    </div>
+
+    <div class="card">
+        <div class="label">RAM Usage</div>
+        <div class="value yellow">{{ health.memory_percent }}%</div>
+        <p>{{ health.memory_used }} GB / {{ health.memory_total }} GB</p>
+    </div>
+
+    <div class="card">
+        <div class="label">Disk Usage</div>
+        <div class="value red">{{ health.disk_percent }}%</div>
+        <p>{{ health.disk_used }} GB / {{ health.disk_total }} GB</p>
+    </div>
+
+</div>
+
+<div class="panel">
+    <h2>Application Status</h2>
+
+    <p><b>Camera Status:</b> {{ health.camera_status }}</p>
+    <p><b>AI Status:</b> {{ health.ai_status }}</p>
+    <p><b>Person Status:</b> {{ health.person_status }}</p>
+</div>
+
+</body>
+</html>

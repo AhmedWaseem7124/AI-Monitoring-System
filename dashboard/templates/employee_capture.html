@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Capture Face Images</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #020617;
+            color: #e5e7eb;
+            padding: 24px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .back-link {
+            color: #93c5fd;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .btn {
+            background: #2563eb;
+            color: white;
+            padding: 11px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;
+            border: none;
+        }
+
+        .success { background: #16a34a; }
+        .danger { background: #dc2626; }
+        .secondary { background: #334155; }
+
+        .hero {
+            background: linear-gradient(145deg, #0f172a, #111827);
+            border: 1px solid #334155;
+            border-radius: 22px;
+            padding: 26px;
+            margin-bottom: 22px;
+            box-shadow: 0 12px 35px rgba(0,0,0,.3);
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .hero p {
+            color: #94a3b8;
+            margin: 8px 0 0;
+        }
+
+        .capture-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 22px;
+        }
+
+        .panel {
+            background: linear-gradient(145deg, #0f172a, #111827);
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.25);
+        }
+
+        .camera-box {
+            position: relative;
+        }
+
+        .video {
+            width: 100%;
+            border-radius: 16px;
+            border: 1px solid #334155;
+            background: #020617;
+        }
+
+        .live-badge {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(22, 163, 74, .9);
+            color: white;
+            padding: 7px 11px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .paused-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(202, 138, 4, .95);
+            color: white;
+            padding: 7px 11px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status-card {
+            background: #020617;
+            border: 1px solid #334155;
+            border-radius: 18px;
+            padding: 22px;
+            margin-bottom: 18px;
+        }
+
+        .status-label {
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .status-text {
+            font-size: 22px;
+            font-weight: bold;
+            color: #e5e7eb;
+            line-height: 1.35;
+        }
+
+        .progress-bg {
+            width: 100%;
+            height: 20px;
+            background: #1e293b;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #22c55e, #3b82f6);
+            transition: width .35s ease;
+        }
+
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        .action-stack {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .action-stack .btn {
+            text-align: center;
+        }
+
+        .tips {
+            color: #cbd5e1;
+            line-height: 1.8;
+        }
+
+        .tips h3 {
+            margin-top: 0;
+            color: #f8fafc;
+        }
+
+        .tip-item {
+            background: #020617;
+            border: 1px solid #1e293b;
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .step {
+            background: #020617;
+            border: 1px solid #334155;
+            border-radius: 16px;
+            padding: 14px;
+            color: #94a3b8;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .step strong {
+            display: block;
+            color: #e5e7eb;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 1000px) {
+            .capture-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .steps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="topbar">
+    <a href="/employee/{{ employee['id'] }}" class="back-link">← Back to Employee Profile</a>
+
+    <a href="/employees" class="btn secondary">Employees</a>
+</div>
+
+<div class="hero">
+    <h1>Face Enrollment Console</h1>
+    <p>
+        Employee: <b>{{ employee["employee_name"] }}</b> |
+        Capture 12 clear face samples directly from CCTV.
+    </p>
+
+    <div class="steps">
+        <div class="step">
+            <strong>1</strong>
+            Stand in front of CCTV
+        </div>
+        <div class="step">
+            <strong>2</strong>
+            Start capture
+        </div>
+        <div class="step">
+            <strong>3</strong>
+            Move face slowly
+        </div>
+        <div class="step">
+            <strong>4</strong>
+            Auto reload database
+        </div>
+    </div>
+</div>
+
+<div class="capture-grid">
+
+    <div class="panel camera-box">
+        <span class="live-badge">● LIVE CCTV</span>
+        <span class="paused-badge">AI PAUSED DURING ENROLLMENT</span>
+
+        <img src="/video_feed" class="video">
+    </div>
+
+    <div class="panel">
+
+        <div class="status-card">
+            <div class="status-label">CAPTURE STATUS</div>
+            <div class="status-text" id="statusText">Ready to capture</div>
+
+            <div class="progress-bg">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="progress-meta">
+                <span id="savedText">0 / 12 images</span>
+                <span id="elapsedText">0 sec</span>
+            </div>
+        </div>
+
+        <div class="action-stack">
+            <a href="/employee/{{ employee['id'] }}/start-capture" class="btn success">
+                Start Capture
+            </a>
+
+            <a href="/employee/{{ employee['id'] }}/stop-capture" class="btn danger">
+                Stop Capture
+            </a>
+
+            <a href="/employee/{{ employee['id'] }}" class="btn secondary">
+                Back Profile
+            </a>
+        </div>
+
+        <div class="tips">
+            <h3>Enrollment Tips</h3>
+
+            <div class="tip-item">Keep only one face visible in the camera.</div>
+            <div class="tip-item">Move slowly: front, left, right, up and down.</div>
+            <div class="tip-item">Avoid motion blur and keep good lighting.</div>
+            <div class="tip-item">The system saves only frames where a face is detected.</div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+let polling = true;
+
+async function updateStatus() {
+    if (!polling) return;
+
+    try {
+        const response = await fetch("/employee/{{ employee['id'] }}/capture-status");
+        const data = await response.json();
+
+        const target = data.target || 12;
+        const saved = data.saved || 0;
+        const percent = Math.min((saved / target) * 100, 100);
+
+        document.getElementById("progressFill").style.width = percent + "%";
+        document.getElementById("savedText").innerText = saved + " / " + target + " images";
+        document.getElementById("elapsedText").innerText = (data.elapsed || 0) + " sec";
+
+        if (data.completed) {
+            polling = false;
+
+            document.getElementById("statusText").innerText =
+                "Enrollment complete. Redirecting to profile...";
+
+            setTimeout(() => {
+                window.location.href = "/employee/{{ employee['id'] }}";
+            }, 1500);
+
+            return;
+        }
+
+        if (data.active) {
+            document.getElementById("statusText").innerText =
+                data.message || "Capturing face images...";
+        } else {
+            document.getElementById("statusText").innerText =
+                data.message || "Ready to capture";
+        }
+
+    } catch (error) {
+        document.getElementById("statusText").innerText =
+            "Unable to read capture status";
+    }
+}
+
+setInterval(updateStatus, 1000);
+updateStatus();
+</script>
+
+</body>
+</html>

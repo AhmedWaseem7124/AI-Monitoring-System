@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #020617;
+            color: #e5e7eb;
+            padding: 24px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        h1 { margin: 0; font-size: 32px; }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-top: 8px;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn, button {
+            border: none;
+            border-radius: 10px;
+            padding: 11px 16px;
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: bold;
+            background: #2563eb;
+        }
+
+        .btn.secondary { background: #334155; }
+        .btn.success, .success { background: #16a34a; }
+        .btn.danger { background: #dc2626; }
+        .btn.warning { background: #ca8a04; }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+
+        .card {
+            background: linear-gradient(145deg, #0f172a, #111827);
+            border: 1px solid #334155;
+            border-radius: 18px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.25);
+        }
+
+        .stat-title {
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .stat-value {
+            margin-top: 12px;
+            font-size: 34px;
+            font-weight: bold;
+        }
+
+        .green { color: #22c55e; }
+        .blue { color: #3b82f6; }
+        .purple { color: #a855f7; }
+        .yellow { color: #eab308; }
+
+        .toolbar {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            background: #020617;
+            color: white;
+        }
+
+        .employees-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .employee-card {
+            background: linear-gradient(145deg, #0f172a, #111827);
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 18px;
+            position: relative;
+        }
+
+        .profile-stack {
+            display: grid;
+            grid-template-columns: repeat(2, 54px);
+            gap: 8px;
+        }
+
+        .profile-stack img {
+            width: 54px;
+            height: 54px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            background: #020617;
+        }
+
+        .empty-avatar {
+            width: 116px;
+            height: 116px;
+            border-radius: 18px;
+            background: #020617;
+            border: 1px dashed #475569;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 36px;
+        }
+
+        .employee-main {
+            min-width: 0;
+        }
+
+        .employee-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .emp-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #22c55e;
+        }
+
+        .emp-role {
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .active {
+            background: #064e3b;
+            color: #34d399;
+        }
+
+        .disabled {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px 16px;
+            color: #cbd5e1;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        .info-grid b {
+            color: #94a3b8;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .small-btn {
+            padding: 8px 11px;
+            border-radius: 9px;
+            font-size: 13px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, .75);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-box {
+            width: 900px;
+            max-width: 100%;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 22px;
+            padding: 24px;
+            box-shadow: 0 30px 90px rgba(0,0,0,.65);
+        }
+
+        .modal-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .modal-head h2 {
+            margin: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .file-row {
+            margin-top: 14px;
+        }
+
+        .hint {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #94a3b8;
+            padding: 50px;
+        }
+
+        @media (max-width: 1100px) {
+            .employees-grid, .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .toolbar {
+                grid-template-columns: 1fr;
+            }
+
+            .employee-card {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page-header">
+    <div>
+        <h1>Employee Management</h1>
+        <div class="subtitle">Manage authorized staff, face profiles, and employee access records</div>
+    </div>
+
+    <div class="top-actions">
+        <button class="success" onclick="openModal()">+ Add Employee</button>
+        <a href="/employees/reload-faces" class="btn secondary">Reload Faces</a>
+        <a href="/" class="btn secondary">Dashboard</a>
+    </div>
+</div>
+
+<div class="stats">
+    <div class="card">
+        <div class="stat-title">Total Employees</div>
+        <div class="stat-value green">{{ employees|length }}</div>
+    </div>
+
+    <div class="card">
+        <div class="stat-title">Active Employees</div>
+        <div class="stat-value blue">
+            {{ employees | selectattr("status", "equalto", "ACTIVE") | list | length }}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="stat-title">Total Face Images</div>
+        <div class="stat-value purple">
+            {{ employees | sum(attribute="image_count") }}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="stat-title">Departments</div>
+        <div class="stat-value yellow">
+            {{ employees | map(attribute="department") | unique | list | length }}
+        </div>
+    </div>
+</div>
+
+<div class="toolbar">
+    <input type="text" id="searchInput" placeholder="Search by name, employee ID, department, designation..." onkeyup="filterEmployees()">
+
+    <select id="statusFilter" onchange="filterEmployees()">
+        <option value="ALL">All Status</option>
+        <option value="ACTIVE">Active</option>
+        <option value="DISABLED">Disabled</option>
+    </select>
+</div>
+
+<div class="employees-grid" id="employeesGrid">
+
+    {% for emp in employees %}
+    <div class="employee-card"
+         data-search="{{ emp.employee_name }} {{ emp.employee_id }} {{ emp.department }} {{ emp.designation }}"
+         data-status="{{ emp.status }}">
+
+        {% if emp.preview|length > 0 %}
+        <div class="profile-stack">
+            {% for img in emp.preview %}
+                <img src="/known-face/{{ emp.folder_name }}/{{ img }}">
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-avatar">👤</div>
+        {% endif %}
+
+        <div class="employee-main">
+            <div class="employee-head">
+                <div>
+                    <div class="emp-name">{{ emp.employee_name }}</div>
+                    <div class="emp-role">{{ emp.designation }} • {{ emp.department }}</div>
+                </div>
+
+                {% if emp.status == "ACTIVE" %}
+                    <span class="badge active">ACTIVE</span>
+                {% else %}
+                    <span class="badge disabled">DISABLED</span>
+                {% endif %}
+            </div>
+
+            <div class="info-grid">
+                <div><b>ID:</b> {{ emp.employee_id }}</div>
+                <div><b>Images:</b> {{ emp.image_count }}</div>
+                <div><b>Email:</b> {{ emp.email or "N/A" }}</div>
+                <div><b>Phone:</b> {{ emp.phone or "N/A" }}</div>
+            </div>
+
+            <div class="actions">
+                <a class="btn small-btn" href="/employee/{{ emp.id }}">View Profile</a>
+                <a class="btn secondary small-btn" href="/employee/{{ emp.id }}/edit">Edit</a>
+                <a class="btn warning small-btn" href="/employee/{{ emp.id }}/capture">Capture</a>
+                <a class="btn secondary small-btn" href="/employee/{{ emp.id }}/upload">Upload</a>
+                <a class="btn danger small-btn"
+                   href="/employees/delete/{{ emp.folder_name }}"
+                   onclick="return confirm('Delete this employee and all face images?')">
+                    Delete
+                </a>
+            </div>
+        </div>
+
+    </div>
+    {% endfor %}
+
+</div>
+
+{% if employees|length == 0 %}
+<div class="card empty-state">
+    No employees added yet. Click <b>+ Add Employee</b> to create the first authorized profile.
+</div>
+{% endif %}
+
+<div class="modal" id="addModal">
+    <div class="modal-box">
+        <div class="modal-head">
+            <h2>Add New Employee</h2>
+            <button class="btn secondary" onclick="closeModal()">Close</button>
+        </div>
+
+        <form method="POST" action="/employees/add" enctype="multipart/form-data">
+            <div class="form-grid">
+                <input type="text" name="employee_name" placeholder="Employee Name" required>
+                <input type="text" name="employee_id" placeholder="Employee ID" required>
+                <input type="text" name="department" placeholder="Department" required>
+                <input type="text" name="designation" placeholder="Designation" required>
+                <input type="email" name="email" placeholder="Email">
+                <input type="text" name="phone" placeholder="Phone">
+            </div>
+
+            <div class="file-row">
+                <input type="file" name="images" multiple accept="image/*" required>
+            </div>
+
+            <button type="submit" class="success">Create Employee</button>
+
+            <div class="hint">
+                Upload 3–10 clear face images. You can also capture more images later from CCTV.
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openModal() {
+    document.getElementById("addModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("addModal").style.display = "none";
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById("addModal");
+    if (event.target === modal) {
+        closeModal();
+    }
+}
+
+function filterEmployees() {
+    const search = document.getElementById("searchInput").value.toLowerCase();
+    const status = document.getElementById("statusFilter").value;
+
+    const cards = document.querySelectorAll(".employee-card");
+
+    cards.forEach(card => {
+        const text = card.dataset.search.toLowerCase();
+        const cardStatus = card.dataset.status;
+
+        const matchesSearch = text.includes(search);
+        const matchesStatus = status === "ALL" || cardStatus === status;
+
+        card.style.display = matchesSearch && matchesStatus ? "grid" : "none";
+    });
+}
+</script>
+
+</body>
+</html>

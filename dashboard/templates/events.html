@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Event Search & Reports</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #020617;
+            color: #e5e7eb;
+            padding: 24px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-top: 8px;
+        }
+
+        .btn, button {
+            background: #2563eb;
+            color: white;
+            padding: 11px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .secondary { background: #334155; }
+        .success { background: #16a34a; }
+        .warning { background: #ca8a04; }
+
+        .panel {
+            background: linear-gradient(145deg, #0f172a, #111827);
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.25);
+            margin-bottom: 22px;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 13px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            background: #020617;
+            color: white;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .email-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: 18px;
+            border: 1px solid #334155;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #0f172a;
+            min-width: 900px;
+        }
+
+        th {
+            background: #020617;
+            color: #94a3b8;
+            text-align: left;
+            padding: 14px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #1e293b;
+            color: #e5e7eb;
+        }
+
+        tr:hover {
+            background: #111827;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .badge-auth {
+            background: #064e3b;
+            color: #34d399;
+        }
+
+        .badge-unknown {
+            background: #7c2d12;
+            color: #fdba74;
+        }
+
+        .badge-enter {
+            background: #064e3b;
+            color: #34d399;
+        }
+
+        .badge-exit {
+            background: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        .badge-email {
+            background: #1d4ed8;
+            color: #bfdbfe;
+        }
+
+        .badge-no {
+            background: #334155;
+            color: #cbd5e1;
+        }
+
+        .thumb {
+            width: 78px;
+            height: 52px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background: #020617;
+        }
+
+        .no-image {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .count-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            color: #94a3b8;
+        }
+
+        @media (max-width: 900px) {
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .filters,
+            .email-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="topbar">
+    <div>
+        <h1>Event Search & Reports</h1>
+        <div class="subtitle">Search, export, and email server room access activity</div>
+    </div>
+
+    <a href="/" class="btn secondary">Dashboard</a>
+</div>
+
+<div class="panel">
+    <form method="get" action="/events">
+
+        <div class="filters">
+            <input type="date" name="start_date" value="{{ start_date or '' }}">
+            <input type="date" name="end_date" value="{{ end_date or '' }}">
+
+            <select name="event_type">
+                <option value="ALL">All Events</option>
+                <option value="PERSON_ENTERED" {% if event_type == "PERSON_ENTERED" %}selected{% endif %}>
+                    Person Entered
+                </option>
+                <option value="PERSON_EXITED" {% if event_type == "PERSON_EXITED" %}selected{% endif %}>
+                    Person Exited
+                </option>
+            </select>
+
+            <select name="identity">
+                <option value="ALL">All Identities</option>
+                <option value="AUTHORIZED" {% if identity == "AUTHORIZED" %}selected{% endif %}>
+                    Known / Authorized
+                </option>
+                <option value="UNKNOWN" {% if identity == "UNKNOWN" %}selected{% endif %}>
+                    Unknown
+                </option>
+            </select>
+        </div>
+
+        <div class="email-row">
+            <select name="person_name">
+                <option value="ALL">All Persons</option>
+                {% for p in people %}
+{% set event_name = p['folder_name'].upper() %}
+    <option value="{{ event_name }}" {% if person_name == event_name %}selected{% endif %}>
+        {{ p['employee_name'] }}
+    </option>
+                {% endfor %}
+            </select>
+
+            <select name="recipient_email">
+                <option value="">Default Recipient</option>
+                <option value="it.intern-waseem@crescent.com.pk">IT Intern - Waseem</option>
+                <option value="osama.mansoor@crescent.com.pk">Osama Mansoor</option>
+                <option value="alerts@crescent.com.pk">Workflow Alerts</option>
+            </select>
+        </div>
+
+        <div class="email-row">
+            <input type="email" name="custom_email" placeholder="Or enter custom email address">
+            <div></div>
+        </div>
+
+        <div class="actions">
+            <button type="submit">Search</button>
+
+            <a href="/events" class="btn secondary">Reset</a>
+
+            <button type="submit"
+                    formaction="/export/pdf"
+                    formmethod="get"
+                    class="success">
+                Export PDF
+            </button>
+
+            <button type="submit"
+                    formaction="/send-report-email"
+                    formmethod="get"
+                    class="warning">
+                Send Report Email
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<div class="panel">
+    <div class="count-bar">
+        <div><b>{{ events|length }}</b> events found</div>
+        <div>Latest access activity</div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Time</th>
+                <th>Person</th>
+                <th>Identity</th>
+                <th>Event</th>
+                <th>Snapshot</th>
+                <th>Email</th>
+            </tr>
+
+            {% for event in events %}
+            <tr>
+                <td>{{ event["id"] }}</td>
+                <td>{{ event["event_time"] }}</td>
+                <td><b>{{ event["person_name"] }}</b></td>
+
+                <td>
+                    {% if event["person_name"].startswith("UNKNOWN") %}
+                        <span class="badge badge-unknown">Unknown</span>
+                    {% else %}
+                        <span class="badge badge-auth">Authorized</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if event["event_type"] == "PERSON_ENTERED" %}
+                        <span class="badge badge-enter">ENTER</span>
+                    {% elif event["event_type"] == "PERSON_EXITED" %}
+                        <span class="badge badge-exit">EXIT</span>
+                    {% else %}
+                        {{ event["event_type"] }}
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if event["image_path"] %}
+                        <a href="/captures/{{ event['image_path'].split('/')[-1] }}" target="_blank">
+                            <img src="/captures/{{ event['image_path'].split('/')[-1] }}" class="thumb">
+                        </a>
+                    {% else %}
+                        <span class="no-image">No Image</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    {% if event["email_sent"] == 1 %}
+                        <span class="badge badge-email">Sent</span>
+                    {% else %}
+                        <span class="badge badge-no">No</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

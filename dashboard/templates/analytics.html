@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analytics Board</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #020617;
+            color: #e5e7eb;
+            padding: 24px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-top: 8px;
+        }
+
+        .btn, button {
+            background: #2563eb;
+            color: white;
+            padding: 11px 15px;
+            border-radius: 10px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .secondary { background: #334155; }
+
+        input {
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            background: #020617;
+            color: white;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+
+        .card, .panel {
+            background: linear-gradient(145deg, #0f172a, #111827);
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.25);
+        }
+
+        .card-title {
+            color: #94a3b8;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .value {
+            margin-top: 14px;
+            font-size: 38px;
+            font-weight: bold;
+        }
+
+        .green { color: #22c55e; }
+        .red { color: #ef4444; }
+        .blue { color: #3b82f6; }
+        .purple { color: #a855f7; }
+        .yellow { color: #eab308; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 22px;
+            margin-bottom: 22px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1.2fr .8fr;
+            gap: 22px;
+        }
+
+        .panel h2 {
+            margin-top: 0;
+        }
+
+        canvas {
+            width: 100% !important;
+            max-height: 330px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            color: #94a3b8;
+            text-align: left;
+            padding: 13px;
+            border-bottom: 1px solid #334155;
+        }
+
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-auth {
+            background: #064e3b;
+            color: #34d399;
+        }
+
+        .badge-unknown {
+            background: #7c2d12;
+            color: #fdba74;
+        }
+
+        .unknown-card {
+            background: #020617;
+            border: 1px solid #334155;
+            border-radius: 18px;
+            padding: 18px;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 1000px) {
+            .cards, .grid, .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="topbar">
+    <div>
+        <h1>Analytics Board</h1>
+<div class="subtitle">
+    Server room access insights from {{ start_date }} to {{ end_date }}
+</div>
+    </div>
+
+    <div class="top-actions">
+        <form method="get" action="/analytics" style="display:flex;gap:10px;flex-wrap:wrap;">
+<input type="date" name="start_date" value="{{ start_date }}">
+<input type="date" name="end_date" value="{{ end_date }}">
+            <button type="submit">Apply</button>
+        </form>
+
+        <a href="/" class="btn secondary">Dashboard</a>
+    </div>
+</div>
+
+<div class="cards">
+    <div class="card">
+        <div class="card-title">Total Entries</div>
+        <div class="value green">{{ total_entries }}</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Total Exits</div>
+        <div class="value red">{{ total_exits }}</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Authorized Entries</div>
+        <div class="value blue">{{ authorized_entries }}</div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Unknown Entries</div>
+        <div class="value purple">{{ unknown_entries }}</div>
+    </div>
+</div>
+
+<div class="grid">
+    <div class="panel">
+        <h2>Hourly Entry / Exit Trend</h2>
+        <canvas id="hourlyChart"></canvas>
+    </div>
+
+    <div class="panel">
+        <h2>Identity Distribution</h2>
+        <canvas id="identityChart"></canvas>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="panel">
+        <h2>Top Visitors</h2>
+        <canvas id="visitorChart"></canvas>
+    </div>
+
+    <div class="panel">
+        <h2>Visitor Details</h2>
+
+        <table>
+            <tr>
+                <th>Person</th>
+                <th>Visits</th>
+                <th>Identity</th>
+            </tr>
+
+            {% for visitor in top_visitors %}
+            <tr>
+                <td><b>{{ visitor["person_name"] }}</b></td>
+                <td>{{ visitor["visits"] }}</td>
+                <td>
+                    {% if visitor["person_name"].startswith("UNKNOWN") %}
+                        <span class="badge badge-unknown">Unknown</span>
+                    {% else %}
+                        <span class="badge badge-auth">Authorized</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <div class="unknown-card">
+            <h2 style="margin:0;">Latest Unknown Visitor</h2>
+
+            {% if latest_unknown %}
+                <h1 class="yellow">{{ latest_unknown["person_name"] }}</h1>
+                <p style="color:#94a3b8;">Last Seen: {{ latest_unknown["event_time"] }}</p>
+            {% else %}
+                <p style="color:#94a3b8;">No unknown visitor found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+const hours = {{ hours | tojson }};
+const entries = {{ entries_by_hour | tojson }};
+const exits = {{ exits_by_hour | tojson }};
+
+const visitorLabels = {{ top_visitors | map(attribute="person_name") | list | tojson }};
+const visitorCounts = {{ top_visitors | map(attribute="visits") | list | tojson }};
+
+Chart.defaults.color = "#e5e7eb";
+Chart.defaults.borderColor = "#1e293b";
+
+new Chart(document.getElementById("hourlyChart"), {
+    type: "line",
+    data: {
+        labels: hours.map(h => h + ":00"),
+        datasets: [
+            {
+                label: "Entries",
+                data: entries,
+                borderColor: "#22c55e",
+                backgroundColor: "rgba(34,197,94,0.14)",
+                fill: true,
+                tension: 0.4,
+                pointRadius: 3
+            },
+            {
+                label: "Exits",
+                data: exits,
+                borderColor: "#ef4444",
+                backgroundColor: "rgba(239,68,68,0.14)",
+                fill: true,
+                tension: 0.4,
+                pointRadius: 3
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                labels: { color: "#e5e7eb" }
+            }
+        },
+        scales: {
+            x: { ticks: { color: "#94a3b8" }, grid: { color: "#1e293b" } },
+            y: { ticks: { color: "#94a3b8" }, grid: { color: "#1e293b" }, beginAtZero: true }
+        }
+    }
+});
+
+new Chart(document.getElementById("identityChart"), {
+    type: "doughnut",
+    data: {
+        labels: ["Authorized", "Unknown"],
+        datasets: [{
+            data: [{{ authorized_entries }}, {{ unknown_entries }}],
+            backgroundColor: ["#22c55e", "#a855f7"],
+            borderColor: "#020617",
+            borderWidth: 3
+        }]
+    },
+    options: {
+        cutout: "68%",
+        plugins: {
+            legend: {
+                position: "bottom",
+                labels: { color: "#e5e7eb" }
+            }
+        }
+    }
+});
+
+new Chart(document.getElementById("visitorChart"), {
+    type: "bar",
+    data: {
+        labels: visitorLabels,
+        datasets: [{
+            label: "Visits",
+            data: visitorCounts,
+            backgroundColor: "#3b82f6",
+            borderRadius: 10
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                labels: { color: "#e5e7eb" }
+            }
+        },
+        scales: {
+            x: { ticks: { color: "#94a3b8" }, grid: { color: "#1e293b" } },
+            y: { ticks: { color: "#94a3b8" }, grid: { color: "#1e293b" }, beginAtZero: true }
+        }
+    }
+});
+</script>
+
+</body>
+</html>

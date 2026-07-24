@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Employee Images</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #020617;
+            color: #e5e7eb;
+            padding: 24px;
+        }
+
+        .layout {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .back-link {
+            color: #93c5fd;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .btn, button {
+            background: #2563eb;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .secondary {
+            background: #334155;
+        }
+
+        .success {
+            background: #16a34a;
+        }
+
+        .hero, .panel {
+            background: linear-gradient(145deg, #0f172a, #111827);
+            border: 1px solid #334155;
+            border-radius: 22px;
+            padding: 26px;
+            box-shadow: 0 12px 35px rgba(0,0,0,.3);
+        }
+
+        .hero {
+            margin-bottom: 22px;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .hero p {
+            color: #94a3b8;
+            margin: 8px 0 0;
+        }
+
+        .upload-zone {
+            background: #020617;
+            border: 2px dashed #475569;
+            border-radius: 22px;
+            padding: 42px;
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .upload-icon {
+            font-size: 52px;
+            margin-bottom: 14px;
+        }
+
+        .upload-zone h2 {
+            margin: 0;
+        }
+
+        .upload-zone p {
+            color: #94a3b8;
+            margin: 10px 0 20px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: white;
+            cursor: pointer;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .tips {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 22px;
+        }
+
+        .tip {
+            background: #020617;
+            border: 1px solid #1e293b;
+            border-radius: 16px;
+            padding: 16px;
+            color: #cbd5e1;
+        }
+
+        .tip strong {
+            display: block;
+            color: #e5e7eb;
+            margin-bottom: 6px;
+        }
+
+        @media (max-width: 800px) {
+            .tips {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <div class="topbar">
+        <a href="/employee/{{ employee['id'] }}" class="back-link">
+            ← Back to Employee Profile
+        </a>
+
+        <a href="/employees" class="btn secondary">
+            Employees
+        </a>
+    </div>
+
+    <div class="hero">
+        <h1>Upload Face Images</h1>
+        <p>
+            Employee: <b>{{ employee["employee_name"] }}</b> |
+            Add additional face samples to improve recognition accuracy.
+        </p>
+    </div>
+
+    <div class="panel">
+
+        <form method="POST" enctype="multipart/form-data">
+
+            <div class="upload-zone">
+                <div class="upload-icon">🖼️</div>
+
+                <h2>Select Face Images</h2>
+
+                <p>
+                    Upload clear face images from different angles and lighting conditions.
+                </p>
+
+                <input type="file" name="images" multiple accept="image/*" required>
+            </div>
+
+            <div class="actions">
+                <button type="submit" class="success">
+                    Upload & Reload Face Database
+                </button>
+
+                <a href="/employee/{{ employee['id'] }}/capture" class="btn secondary">
+                    Capture From CCTV Instead
+                </a>
+
+                <a href="/employee/{{ employee['id'] }}" class="btn secondary">
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+
+        <div class="tips">
+            <div class="tip">
+                <strong>Use clear images</strong>
+                Avoid blur, darkness, or blocked faces.
+            </div>
+
+            <div class="tip">
+                <strong>Add variety</strong>
+                Use front, left, right, and slight angle images.
+            </div>
+
+            <div class="tip">
+                <strong>Best amount</strong>
+                5–12 good images are usually enough.
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

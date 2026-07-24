@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Employee</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #020617;
+            color: #e5e7eb;
+            padding: 24px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .back-link {
+            color: #93c5fd;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .layout {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .hero {
+            background: linear-gradient(145deg, #0f172a, #111827);
+            border: 1px solid #334155;
+            border-radius: 22px;
+            padding: 26px;
+            margin-bottom: 22px;
+            box-shadow: 0 12px 35px rgba(0,0,0,.3);
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .hero p {
+            color: #94a3b8;
+            margin: 8px 0 0;
+        }
+
+        .panel {
+            background: linear-gradient(145deg, #0f172a, #111827);
+            border: 1px solid #334155;
+            border-radius: 22px;
+            padding: 26px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.25);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            color: #94a3b8;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            background: #020617;
+            color: white;
+            font-size: 15px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .25);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .btn, button {
+            background: #2563eb;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 10px;
+            border: none;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .secondary {
+            background: #334155;
+        }
+
+        .danger-zone {
+            margin-top: 24px;
+            background: #1f0b0b;
+            border: 1px solid #7f1d1d;
+            border-radius: 18px;
+            padding: 18px;
+        }
+
+        .danger-zone h3 {
+            color: #fca5a5;
+            margin-top: 0;
+        }
+
+        .danger-zone p {
+            color: #fca5a5;
+            margin-bottom: 14px;
+        }
+
+        .danger {
+            background: #dc2626;
+        }
+
+        @media (max-width: 750px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <div class="topbar">
+        <a href="/employee/{{ employee['id'] }}" class="back-link">
+            ← Back to Employee Profile
+        </a>
+
+        <a href="/employees" class="btn secondary">
+            Employees
+        </a>
+    </div>
+
+    <div class="hero">
+        <h1>Edit Employee</h1>
+        <p>Update employee identity, department, contact details, and access status.</p>
+    </div>
+
+    <div class="panel">
+        <form method="POST">
+
+            <div class="form-grid">
+
+                <div class="field">
+                    <label>Employee Name</label>
+                    <input type="text" name="employee_name" value="{{ employee['employee_name'] }}" required>
+                </div>
+
+                <div class="field">
+                    <label>Employee ID</label>
+                    <input type="text" name="employee_id" value="{{ employee['employee_id'] }}" required>
+                </div>
+
+                <div class="field">
+                    <label>Department</label>
+                    <input type="text" name="department" value="{{ employee['department'] }}" required>
+                </div>
+
+                <div class="field">
+                    <label>Designation</label>
+                    <input type="text" name="designation" value="{{ employee['designation'] }}" required>
+                </div>
+
+                <div class="field">
+                    <label>Email</label>
+                    <input type="email" name="email" value="{{ employee['email'] or '' }}">
+                </div>
+
+                <div class="field">
+                    <label>Phone</label>
+                    <input type="text" name="phone" value="{{ employee['phone'] or '' }}">
+                </div>
+
+                <div class="field">
+                    <label>Access Status</label>
+                    <select name="status">
+                        <option value="ACTIVE" {% if employee['status'] == "ACTIVE" %}selected{% endif %}>
+                            ACTIVE
+                        </option>
+                        <option value="DISABLED" {% if employee['status'] == "DISABLED" %}selected{% endif %}>
+                            DISABLED
+                        </option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="actions">
+                <button type="submit">Save Changes</button>
+                <a href="/employee/{{ employee['id'] }}" class="btn secondary">Cancel</a>
+            </div>
+
+        </form>
+
+        <div class="danger-zone">
+            <h3>Danger Zone</h3>
+            <p>
+                Deleting this employee will remove the employee record and all associated face images.
+            </p>
+
+            <a href="/employees/delete/{{ employee['folder_name'] }}"
+               class="btn danger"
+               onclick="return confirm('Delete this employee and all face images?')">
+                Delete Employee
+            </a>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
